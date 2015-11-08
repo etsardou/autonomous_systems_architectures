@@ -4,6 +4,7 @@ Panels:
     Name: Displays
     Property Tree Widget:
       Expanded:
+        - /TF1
         - /TF1/Frames1
       Splitter Ratio: 0.647651
     Tree Height: 667
@@ -25,7 +26,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: LaserScan
+    SyncSource: ""
 Visualization Manager:
   Class: ""
   Displays:
@@ -47,39 +48,33 @@ Visualization Manager:
       Plane Cell Count: 40
       Reference Frame: <Fixed Frame>
       Value: true
-    - Alpha: 0.8
-      Class: rviz/Map
-      Color Scheme: costmap
-      Draw Behind: true
-      Enabled: true
-      Name: Map
-      Topic: /map
-      Value: true
     - Class: rviz/TF
       Enabled: true
       Frame Timeout: 15
       Frames:
-        All Enabled: true
+        All Enabled: false
+        base_footprint:
+          Value: true
         map:
           Value: true
         map_static:
-          Value: true
+          Value: false
         robot0:
-          Value: true
+          Value: false
         robot0_laser_0:
-          Value: true
+          Value: false
         robot0_sonar_0:
-          Value: true
+          Value: false
         robot0_sonar_1:
-          Value: true
+          Value: false
         robot0_sonar_2:
-          Value: true
+          Value: false
         robot0_sonar_3:
-          Value: true
+          Value: false
         robot0_sonar_4:
-          Value: true
+          Value: false
         world:
-          Value: true
+          Value: false
       Marker Scale: 2
       Name: TF
       Show Arrows: false
@@ -88,6 +83,8 @@ Visualization Manager:
       Tree:
         world:
           map:
+            base_footprint:
+              {}
             map_static:
               robot0:
                 robot0_laser_0:
@@ -103,44 +100,6 @@ Visualization Manager:
                 robot0_sonar_4:
                   {}
       Update Interval: 0
-      Value: true
-    - Alpha: 1
-      Autocompute Intensity Bounds: true
-      Autocompute Value Bounds:
-        Max Value: 10
-        Min Value: -10
-        Value: true
-      Axis: Z
-      Channel Name: x
-      Class: rviz/LaserScan
-      Color: 255; 255; 255
-      Color Transformer: Intensity
-      Decay Time: 0
-      Enabled: true
-      Invert Rainbow: true
-      Max Color: 255; 255; 255
-      Max Intensity: 10.5148
-      Min Color: 0; 0; 0
-      Min Intensity: 7.89098
-      Name: LaserScan
-      Position Transformer: XYZ
-      Queue Size: 10
-      Selectable: true
-      Size (Pixels): 3
-      Size (m): 0.01
-      Style: Flat Squares
-      Topic: /robot0/laser_0
-      Use Fixed Frame: true
-      Use rainbow: true
-      Value: true
-    - Alpha: 0.5
-      Buffer Length: 1
-      Class: rviz/Range
-      Color: 255; 255; 255
-      Enabled: true
-      Name: Range
-      Queue Size: 100
-      Topic: /robot0/sonar_0
       Value: true
     - Alpha: 0.6
       Class: rviz/Map
