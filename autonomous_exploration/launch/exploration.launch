@@ -2,4 +2,5 @@
   <include file="$(find autonomous_exploration)/launch/stdr.launch" />
   <include file="$(find autonomous_exploration)/launch/crsm.launch" />
   <node name="rviz" type="rviz" pkg="rviz" args="-d $(find autonomous_exploration)/rviz/config.rviz" />
+  <node name="autonomous_exploration_node" type="main.py" pkg="autonomous_exploration" output="screen" />
 </launch>
