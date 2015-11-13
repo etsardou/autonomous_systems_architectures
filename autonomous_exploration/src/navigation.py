@@ -6,6 +6,9 @@ from robot_perception import RobotPerception
 from target_selection import TargetSelection
 from path_planning import PathPlanning
 
+from nav_msgs.msg import Path
+from geometry_msgs.msg import PoseStamped
+
 # Class for reading the data from sensors
 class Navigation:
 
@@ -17,8 +20,12 @@ class Navigation:
         self.target_selection = TargetSelection()
         self.path_planning = PathPlanning()
 
+        # Check if the robot moves with target or just wanders
+        self.move_with_target = rospy.get_param("calculate_target")
+
         # Flag to check if the vehicle has a target or not
         self.target_exists = False
+        self.inner_target_exists = False
 
         # Container for the current path
         self.path = []
@@ -31,9 +38,13 @@ class Navigation:
         # Check if subgoal is reached 
         rospy.Timer(rospy.Duration(0.10), self.checkTarget)
 
+        # ROS Publisher for the path
+        self.path_publisher = rospy.Publisher("/autonomous_systems/path", \
+            Path, queue_size = 10)
+
     def checkTarget(self, event):
-        # Check if we have a target
-        if self.target_exists == False:
+        # Check if we have a target or if the robot just wanders
+        if self.inner_target_exists == False or self.move_with_target == False:
           return
 
         # Get the robot pose in pixels
@@ -55,17 +66,39 @@ class Navigation:
 
     def selectTarget(self):
 
+        # Check if we have a map
+        while self.robot_perception.have_map == False:
+          return
+
+        print "Navigation: Producing new target"
+        # We are good to continue the exploration
+        # Make this true in order not to call it again from the speeds assignment
+        self.target_exists = True
+
         # Manually update the coverage field
         self.robot_perception.updateCoverage()
+        print "Navigation: Coverage updated"
       
         # Call the target selection function to do this
-        self.target_selection.selectTarget(\
+        target = self.target_selection.selectTarget(\
             self.robot_perception.ogm,\
             self.robot_perception.coverage,\
             self.robot_perception.robot_pose)
+        print "Navigation: New target: " + str(target)
 
         # Once the target has been found, find the path to it
-        self.path = self.createPath()
+        # Get the global robot pose
+        g_robot_pose = self.robot_perception.getGlobalCoordinates(\
+            [self.robot_perception.robot_pose['x_px'],\
+            self.robot_perception.robot_pose['y_px']])
+
+        self.path = self.path_planning.createPath(\
+            self.robot_perception.ogm,\
+            g_robot_pose,\
+            target)
+        print "Navigation: Path for target found with " + str(len(self.path)) +\
+            " points"
+
         # Break the path to subgoals every 25 pixels (0.5m)
         n_subgoals = (int) (len(self.path)/25)
         self.subtargets = []
@@ -74,8 +107,19 @@ class Navigation:
         self.subtargets.append(self.path[-1])
         self.next_subtarget = 0
 
-        # We are good to continue the exploration
-        self.target_exists = True
+        # Publish the target and the path for visualization purposes
+        ros_path = Path()
+        ros_path.frame_id = "map"
+        for p in self.path:
+          ps = PoseStamped()
+          ps.header.frame_id = "map"
+          ps.pose.position.x = p[0]
+          ps.pose.position.y = p[1]
+          ros_path.poses.append(ps)
+
+        self.path_publisher.publish(ros_path)
+
+        self.inner_target_exists = True
 
     def velocitiesToNextSubtarget(self):
         

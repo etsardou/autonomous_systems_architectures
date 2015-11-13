@@ -12,6 +12,7 @@ class RobotPerception:
     def __init__(self):
 
         self.print_robot_pose = False
+        self.have_map = False
 
         # Holds the occupancy grid map
         self.ogm = 0
@@ -69,8 +70,8 @@ class RobotPerception:
 
         self.robot_pose['x'] = translation[0]
         self.robot_pose['y'] = translation[1]
-        self.robot_pose['x_px'] = self.robot_pose['x'] / self.resolution
-        self.robot_pose['y_px'] = self.robot_pose['y'] / self.resolution
+        self.robot_pose['x_px'] = int(self.robot_pose['x'] / self.resolution)
+        self.robot_pose['y_px'] = int(self.robot_pose['y'] / self.resolution)
 
         angles = tf.transformations.euler_from_quaternion(rotation)
         self.robot_pose['th'] = angles[2]
@@ -101,8 +102,8 @@ class RobotPerception:
         
         self.origin['x'] = data.info.origin.position.x
         self.origin['y'] = data.info.origin.position.y
-
-        self.updateCoverage()
+        
+        self.have_map = True
 
     def updateCoverage(self):
         
@@ -123,4 +124,17 @@ class RobotPerception:
         coverage_ogm.header.frame_id = "map"
         coverage_ogm.info = self.ogm_info
         self.coverage_publisher.publish(coverage_ogm)
-       
+    
+    # Transforms relative coordinates to global
+    def getGlobalCoordinates(self, p, with_resolution = True):
+      if with_resolution == True:
+        return [\
+            p[0] - int(self.origin['x'] / self.resolution),\
+            p[1] - int(self.origin['y'] / self.resolution)\
+            ]
+      else:
+        return [\
+            p[0] - self.origin['x'],\
+            p[1] - self.origin['y']\
+            ]
+

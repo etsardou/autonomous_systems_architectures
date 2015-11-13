@@ -9,7 +9,7 @@ from speeds_assignment import RobotController
 if __name__ == '__main__':
 
     # Wait for simulator and SLAM to initialize
-    time.sleep(5)
+    time.sleep(0)
     
     # Initializes the ROS node
     rospy.init_node('robot_controller')
