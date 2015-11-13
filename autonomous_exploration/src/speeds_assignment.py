@@ -16,6 +16,8 @@ class RobotController:
     def __init__(self):
 
         self.print_velocities = False
+
+        # Where and when should you use this?
         self.stop_robot = False
 
         self.sonar_aggregation = SonarDataAggregator()
@@ -92,6 +94,7 @@ class RobotController:
     def produceSpeedsSubsumption(self):
         [l_sonar, a_sonar] = self.produceSpeedsSonars()
         [l_laser, a_laser] = self.produceSpeedsLaser()
+        [l_goal, a_goal] = self.navigation.velocitiesToNextSubtarget()
 
         self.linear_velocity  = 0
         self.angular_velocity = 0
@@ -104,6 +107,7 @@ class RobotController:
     def produceSpeedsMotorSchema(self):
         [l_sonar, a_sonar] = self.produceSpeedsSonars()
         [l_laser, a_laser] = self.produceSpeedsLaser()
+        [l_goal, a_goal] = self.navigation.velocitiesToNextSubtarget()
 
         self.linear_velocity  = 0
         self.angular_velocity = 0
@@ -116,4 +120,4 @@ class RobotController:
       self.stop_robot = True
 
     def resumeRobot(self):
-      self.stop_robot = False;
+      self.stop_robot = False

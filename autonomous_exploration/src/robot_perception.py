@@ -13,7 +13,21 @@ class RobotPerception:
 
         self.print_robot_pose = False
 
+        # Holds the occupancy grid map
         self.ogm = 0
+
+        # Holds the ogm info for copying reasons -- do not change
+        self.ogm_info = 0
+
+        # Holds the robot's total path
+        self.robot_path = []
+
+        # Holds the coverage information. This has the same size as the ogm
+        # If a cell has the value of 0 it is uncovered
+        # In the opposite case the cell's value will be 100
+        self.coverage = 0
+
+        # Holds the resolution of the occupancy grid map
         self.resolution = 0.2
         
         # Origin is the translation between the (0,0) of the robot pose and the
@@ -41,7 +55,10 @@ class RobotPerception:
         # ROS Subscriber to the occupancy grid map
         rospy.Subscriber("/slam/occupancyGridMap", OccupancyGrid, self.getMap) 
 
-    # Getting data from the laser
+        self.coverage_publisher = rospy.Publisher("/robot/coverage", \
+            OccupancyGrid, queue_size = 10)
+
+    # Reading the robot pose
     def readRobotPose(self, event):
         try:
             (translation, rotation) = self.listener.lookupTransform\
@@ -61,6 +78,12 @@ class RobotPerception:
         if self.print_robot_pose == True:
             print self.robot_pose
 
+        # YOUR CODE HERE ------------------------------------------------------
+        # Update the robot path. This is a python list. Since we use the path
+        # only for updating the coverage, try not to add duplicates
+
+        # ---------------------------------------------------------------------
+
     # Getting the occupancy grid map
     def getMap(self, data):
         # OGM is a 2D array of size width x height
@@ -68,9 +91,36 @@ class RobotPerception:
         # 0 is an unoccupied pixel
         # 100 is an occupied pixel
         # 50 is the unknown
+        
+        self.ogm_info = data.info
+        
         self.ogm = numpy.array(data.data).reshape(\
                 data.info.width, data.info.height)
+        
         self.resolution = data.info.resolution
+        
         self.origin['x'] = data.info.origin.position.x
         self.origin['y'] = data.info.origin.position.y
 
+        self.updateCoverage()
+
+    def updateCoverage(self):
+        
+        # Reinitialize coverage map
+        ogm_shape = self.ogm.shape
+        self.coverage = numpy.zeros(ogm_shape)
+        
+        # YOUR CODE HERE ------------------------------------------------------
+        # Update the coverage field using the self.robot_path veriable.
+        # We suppose that in every pose the robot covers an area of 2m x 2m
+        # around it
+        # 0 is for the uncovered, 100 is for the covered
+
+        # ---------------------------------------------------------------------
+
+        # Publishing coverage ogm to see it in rviz
+        coverage_ogm = OccupancyGrid()
+        coverage_ogm.header.frame_id = "map"
+        coverage_ogm.info = self.ogm_info
+        self.coverage_publisher.publish(coverage_ogm)
+       
