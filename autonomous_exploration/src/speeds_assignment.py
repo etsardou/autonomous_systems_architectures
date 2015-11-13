@@ -7,7 +7,7 @@ from geometry_msgs.msg import Twist
 
 from sonar_data_aggregator import SonarDataAggregator
 from laser_data_aggregator import LaserDataAggregator
-from robot_perception import RobotPerception
+from navigation import Navigation
 
 # Class for assigning the robot speeds 
 class RobotController:
@@ -20,7 +20,7 @@ class RobotController:
 
         self.sonar_aggregation = SonarDataAggregator()
         self.laser_aggregation = LaserDataAggregator()
-        self.robot_perception  = RobotPerception()
+        self.navigation  = Navigation()
 
         self.linear_velocity  = 0
         self.angular_velocity = 0
