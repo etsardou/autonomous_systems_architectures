@@ -15,6 +15,9 @@ class RobotController:
     # Constructor
     def __init__(self):
 
+        self.print_velocities = False
+        self.stop_robot = False
+
         self.sonar_aggregation = SonarDataAggregator()
         self.laser_aggregation = LaserDataAggregator()
         self.robot_perception  = RobotPerception()
@@ -51,8 +54,9 @@ class RobotController:
         # Send the command
         self.velocity_publisher.publish(twist)
 
-        print "[L,R] = [" + str(twist.linear.x) + " , " + \
-            str(twist.angular.z) + "]"
+        if self.print_velocities == True:
+          print "[L,R] = [" + str(twist.linear.x) + " , " + \
+              str(twist.angular.z) + "]"
 
     # Produce speeds from sonars
     def produceSpeedsSonars(self):
@@ -107,3 +111,9 @@ class RobotController:
         # YOUR CODE HERE ------------------------------------------------------
         
         # ---------------------------------------------------------------------
+
+    def stopRobot(self):
+      self.stop_robot = True
+
+    def resumeRobot(self):
+      self.stop_robot = False;
