@@ -7,6 +7,7 @@ from geometry_msgs.msg import Twist
 
 from sonar_data_aggregator import SonarDataAggregator
 from laser_data_aggregator import LaserDataAggregator
+from robot_perception import RobotPerception
 
 # Class for assigning the robot speeds 
 class RobotController:
@@ -16,6 +17,7 @@ class RobotController:
 
         self.sonar_aggregation = SonarDataAggregator()
         self.laser_aggregation = LaserDataAggregator()
+        self.robot_perception  = RobotPerception()
 
         self.linear_velocity  = 0
         self.angular_velocity = 0
@@ -49,7 +51,8 @@ class RobotController:
         # Send the command
         self.velocity_publisher.publish(twist)
 
-        print twist
+        print "[L,R] = [" + str(twist.linear.x) + " , " + \
+            str(twist.angular.z) + "]"
 
     # Produce speeds from sonars
     def produceSpeedsSonars(self):

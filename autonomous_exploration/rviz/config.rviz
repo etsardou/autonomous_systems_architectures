@@ -4,7 +4,6 @@ Panels:
     Name: Displays
     Property Tree Widget:
       Expanded:
-        - /TF1
         - /TF1/Frames1
       Splitter Ratio: 0.647651
     Tree Height: 667
@@ -144,8 +143,8 @@ Visualization Manager:
       Scale: 40.7134
       Target Frame: <Fixed Frame>
       Value: TopDownOrtho (rviz)
-      X: 6.80073
-      Y: 5.7046
+      X: 6.23581
+      Y: 3.05191
     Saved: ~
 Window Geometry:
   Displays:

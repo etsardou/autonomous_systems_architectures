@@ -9,15 +9,15 @@ class LaserDataAggregator:
     # Constructor
     def __init__(self):
 
-        # Initialization of 
+        # Initialization of laser scan 
         self.laser_scan = []
 
         # ROS Subscribers to the robot's laser
         rospy.Subscriber("/robot0/laser_0", LaserScan, self.getDataLaser) 
 
-    # Getting data from the front sonar
+    # Getting data from the laser
     def getDataLaser(self, data):
-        self.laser_scan = data.ranges
+        self.laser_scan = list(data.ranges)
         for i in range(0, len(self.laser_scan)):
             if self.laser_scan[i] > data.range_max:
                 self.laser_scan[i] = data.range_max
