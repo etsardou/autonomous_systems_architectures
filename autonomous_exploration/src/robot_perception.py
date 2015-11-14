@@ -13,9 +13,12 @@ class RobotPerception:
 
         self.print_robot_pose = False
         self.have_map = False
+        self.map_token = False
+        self.map_compute = False
 
         # Holds the occupancy grid map
         self.ogm = 0
+        self.ogm_copy = 0
 
         # Holds the ogm info for copying reasons -- do not change
         self.ogm_info = 0
@@ -54,10 +57,24 @@ class RobotPerception:
         rospy.Timer(rospy.Duration(0.11), self.readRobotPose)
 
         # ROS Subscriber to the occupancy grid map
-        rospy.Subscriber("/slam/occupancyGridMap", OccupancyGrid, self.getMap) 
+        rospy.Subscriber("/slam/occupancyGridMap", OccupancyGrid, self.readMap) 
 
         self.coverage_publisher = rospy.Publisher("/robot/coverage", \
             OccupancyGrid, queue_size = 10)
+
+    # Getter for OGM. Must use flags since its update is asynchronous
+    def getMap(self):
+      print "Robot perception: Map requested"
+      while self.map_compute == True:
+        pass
+      self.map_token = True
+      cp = numpy.copy(self.ogm)
+      self.map_token = False
+      return cp
+
+    # Getter for Coverage
+    def getCoverage(self):
+      return numpy.copy(self.coverage)
 
     # Reading the robot pose
     def readRobotPose(self, event):
@@ -86,24 +103,37 @@ class RobotPerception:
         # ---------------------------------------------------------------------
 
     # Getting the occupancy grid map
-    def getMap(self, data):
+    def readMap(self, data):
         # OGM is a 2D array of size width x height
         # The values are from 0 to 100
         # 0 is an unoccupied pixel
         # 100 is an occupied pixel
         # 50 is the unknown
-        
+
+        self.map_compute = True
+
         self.ogm_info = data.info
-        
-        self.ogm = numpy.array(data.data).reshape(\
-                data.info.width, data.info.height)
+        self.ogm = numpy.zeros((data.info.width, data.info.height), dtype = numpy.int)
+        for x in range(0, data.info.width):
+          for y in range(0, data.info.height):
+            self.ogm[x][y] = data.data[x + data.info.width * y]
         
         self.resolution = data.info.resolution
         
         self.origin['x'] = data.info.origin.position.x
         self.origin['y'] = data.info.origin.position.y
         
-        self.have_map = True
+        self.ogm_copy = numpy.copy(self.ogm)
+
+        self.map_compute = False
+        #print "Map token is " + str(self.map_token)
+        while self.map_token == True:
+          pass
+        
+        # This is for the navigation
+        if self.have_map == False:
+          self.have_map = True
+          print "Robot perception: Map initialized"
 
     def updateCoverage(self):
         

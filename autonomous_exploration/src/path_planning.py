@@ -22,13 +22,17 @@ class PathPlanning:
     # Reconstruction of path for A*
     def aStarReconstructPath(self, came_from, current):
         total_path = [current]
-        while current in came_from:
-            current = came_from[current]
-            total_path.append(current)
+        local_curr = list(current)
+        while True:
+            temp = came_from[tuple(local_curr)]
+            if temp == None:
+                break
+            local_curr = list(temp)
+            total_path.append(local_curr)
         return total_path
 
     def aStar(self, ogm, start, goal):
-
+        
         # The set of evaluated nodes
         closed_set = []
         # The set of nodes to be evaluated
@@ -47,6 +51,7 @@ class PathPlanning:
                 self.aStarHeuristic(tuple(start), tuple(goal)) #??
 
         while len(open_set) != 0:
+            #print "Open set: " + str(open_set)
             # Find element in open set with minimum f_score
             min_key = -1
             min_val = float('inf')
@@ -56,33 +61,44 @@ class PathPlanning:
                     min_val = f_score[tuple(key)]
 
             current = min_key
+            #print "Current: " + str(current) + " with cost " + str(min_val)
             # Check if the goal was reached
-            if current == goal:
+            if tuple(current) == tuple(goal):
                 return self.aStarReconstructPath(came_from, goal)
 
             open_set.remove(tuple(current))
             closed_set.append(tuple(current))
+            #print "open set now: " + str(open_set)
+            #print "closed set now: " + str(closed_set)
 
             # Go through the current's neighbors
             for i in range(-1, 2):
                 for j in range(-1, 2):
                     neighbor = [current[0] + i, current[1] + j]
+                    #print "Checking neighbor " + str(neighbor)
                     # Check if the neighbor is unoccupied
                     if ogm[neighbor[0]][neighbor[1]] > 49:
+                        #print "neigh is occupied: " + str(ogm[neighbor[0]][neighbor[1]])
                         continue
+                    #print "neigh is unoccupied"
                     # The neighbor is already evaluated
                     if tuple(neighbor) in closed_set:
                         continue
+                    #print "neigh is not in closed set"
                     # Length of this path
                     tentative_g_score = g_score[tuple(current)] + \
                             self.aStarHeuristic(tuple(current), tuple(neighbor))
-
+                    #print "tentative score : " + str(tentative_g_score)
                     # Check if we have a new node
                     if tuple(neighbor) not in open_set:
+                        #print "Added neighbor in open set"
                         open_set.append(tuple(neighbor))
                     elif tentative_g_score >= g_score[tuple(neighbor)]:
+                        #print "Tentative is larger than neighbor score: " + \
+                                #str(tentative_g_score) + " " + str(g_score[tuple(neighbor)])
                         continue    # This is not a better path
 
+                    #print "Update values"
                     came_from[tuple(neighbor)] = current
                     g_score[tuple(neighbor)] = tentative_g_score
                     f_score[tuple(neighbor)] = g_score[tuple(neighbor)] + \

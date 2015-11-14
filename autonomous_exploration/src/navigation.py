@@ -65,7 +65,8 @@ class Navigation:
             self.target_exists = False
 
     def selectTarget(self):
-
+        # IMPORTANT: The robot must be stopped if you call this function until
+        # it is over
         # Check if we have a map
         while self.robot_perception.have_map == False:
           return
@@ -79,10 +80,14 @@ class Navigation:
         self.robot_perception.updateCoverage()
         print "Navigation: Coverage updated"
       
+        local_ogm = self.robot_perception.getMap()
+        local_coverage = self.robot_perception.getCoverage()
+        print "Got the map and Coverage"
+  
         # Call the target selection function to do this
         target = self.target_selection.selectTarget(\
-            self.robot_perception.ogm,\
-            self.robot_perception.coverage,\
+            local_ogm,\
+            local_coverage,\
             self.robot_perception.robot_pose)
         print "Navigation: New target: " + str(target)
 
@@ -92,8 +97,9 @@ class Navigation:
             [self.robot_perception.robot_pose['x_px'],\
             self.robot_perception.robot_pose['y_px']])
 
+        #target = [242,250]
         self.path = self.path_planning.createPath(\
-            self.robot_perception.ogm,\
+            local_ogm,\
             g_robot_pose,\
             target)
         print "Navigation: Path for target found with " + str(len(self.path)) +\
@@ -109,12 +115,12 @@ class Navigation:
 
         # Publish the target and the path for visualization purposes
         ros_path = Path()
-        ros_path.frame_id = "map"
+        ros_path.header.frame_id = "map"
         for p in self.path:
           ps = PoseStamped()
           ps.header.frame_id = "map"
-          ps.pose.position.x = p[0]
-          ps.pose.position.y = p[1]
+          ps.pose.position.x = p[0] * self.robot_perception.resolution + self.robot_perception.origin['x']
+          ps.pose.position.y = p[1] * self.robot_perception.resolution + self.robot_perception.origin['y']
           ros_path.poses.append(ps)
 
         self.path_publisher.publish(ros_path)
