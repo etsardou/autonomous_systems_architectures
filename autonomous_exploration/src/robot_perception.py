@@ -3,6 +3,7 @@
 import rospy
 import tf
 import numpy
+
 from nav_msgs.msg import OccupancyGrid
 
 # Class implementing the robot perception: Reading the map, the coverage map

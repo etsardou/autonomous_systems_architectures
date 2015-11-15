@@ -8,6 +8,8 @@ from path_planning import PathPlanning
 
 from nav_msgs.msg import Path
 from geometry_msgs.msg import PoseStamped
+from visualization_msgs.msg import Marker
+from visualization_msgs.msg import MarkerArray
 
 # Class for implementing the navigation module of the robot
 class Navigation:
@@ -39,25 +41,45 @@ class Navigation:
         rospy.Timer(rospy.Duration(0.10), self.checkTarget)
 
         # ROS Publisher for the path
-        self.path_publisher = rospy.Publisher("/autonomous_systems/path", \
+        self.path_publisher = rospy.Publisher(rospy.get_param('path_pub_topic'), \
             Path, queue_size = 10)
+        # ROS Publisher for the subtargets
+        self.subtargets_publisher = rospy.Publisher(rospy.get_param('subgoals_pub_topic'),\
+            MarkerArray, queue_size = 10)
+        # ROS Publisher for the current target
+        self.current_target_publisher = rospy.Publisher(rospy.get_param('curr_target_pub_topic'),\
+            Marker, queue_size = 10)
+
 
     def checkTarget(self, event):
         # Check if we have a target or if the robot just wanders
-        if self.inner_target_exists == False or self.move_with_target == False:
+        if self.inner_target_exists == False or self.move_with_target == False or\
+                self.next_subtarget == len(self.subtargets):
           return
 
         # Get the robot pose in pixels
         [rx, ry] = [\
-            self.robot_perception.robot_pose['x_px'],
-            self.robot_perception.robot_pose['y_px']]
+            self.robot_perception.robot_pose['x_px'] - \
+                    self.robot_perception.origin['x'] / self.robot_perception.resolution,\
+            self.robot_perception.robot_pose['y_px'] - \
+                    self.robot_perception.origin['y'] / self.robot_perception.resolution\
+                    ]
+
+        # YOUR CODE HERE ------------------------------------------------------
+        # Here the next subtarget is checked for proximity. If the robot is too
+        # close to the subtarget it is considered approached and the next
+        # subtarget is assigned as next. However there are cases where the
+        # robot misses one subtarget due to obstacle detection. Enhance the below
+        # functionality by checking all the subgoals (and the final goal) for
+        # proximity and assign the proper next subgoal
+
         # Find the distance between the robot pose and the next subtarget
         dist = math.hypot(\
             rx - self.subtargets[self.next_subtarget][0], \
             ry - self.subtargets[self.next_subtarget][1])
 
-        # Check if distance is less than 10 px (20 cm)
-        if dist < 10:
+        # Check if distance is less than 7 px (14 cm)
+        if dist < 7:
           print "Sub target reached!"
           self.next_subtarget += 1
 
@@ -65,6 +87,35 @@ class Navigation:
           if self.next_subtarget == len(self.subtargets):
             print "Final goal reached!"
             self.target_exists = False
+
+        # ---------------------------------------------------------------------
+
+        # Publish the current target
+        if self.next_subtarget == len(self.subtargets):
+            return
+        st = Marker()
+        st.header.frame_id = "map"
+        st.ns = 'as_curr_namespace'
+        st.id = 0
+        st.header.stamp = rospy.Time(0)
+        st.type = 1 # arrow
+        st.action = 0 # add
+        st.pose.position.x = self.subtargets[self.next_subtarget][0]\
+                * self.robot_perception.resolution + \
+                self.robot_perception.origin['x']
+        st.pose.position.y = self.subtargets[self.next_subtarget][1]\
+                * self.robot_perception.resolution + \
+                self.robot_perception.origin['y']
+
+        st.color.r = 0
+        st.color.g = 0
+        st.color.b = 0.8
+        st.color.a = 0.8
+        st.scale.x = 0.2
+        st.scale.y = 0.2
+        st.scale.z = 0.2
+
+        self.current_target_publisher.publish(st)
 
     # Function that seelects the next target, produces the path and updates
     # the coverage field. This is called from the speeds assignment code, since
@@ -113,16 +164,17 @@ class Navigation:
         # Reverse the path to start from the robot
         self.path = self.path[::-1]
 
-        # Break the path to subgoals every 25 pixels (0.5m)
-        n_subgoals = (int) (len(self.path)/25)
+        # Break the path to subgoals every 10 pixels (0.5m)
+        step = 10
+        n_subgoals = (int) (len(self.path)/step)
         self.subtargets = []
         for i in range(0, n_subgoals):
-          self.subtargets.append(self.path[i * 25])
+          self.subtargets.append(self.path[i * step])
         self.subtargets.append(self.path[-1])
         self.next_subtarget = 0
         print "The path produced " + str(len(self.subtargets)) + " subgoals"
 
-        # Publish the target, the subtargets and the path for visualization purposes
+        # Publish the path for visualization purposes
         ros_path = Path()
         ros_path.header.frame_id = "map"
         for p in self.path:
@@ -135,6 +187,34 @@ class Navigation:
           ros_path.poses.append(ps)
 
         self.path_publisher.publish(ros_path)
+
+        # Publish the subtargets for visualization purposes
+        ros_subgoals = MarkerArray()
+        count = 0
+        for s in self.subtargets:
+            st = Marker()
+            st.header.frame_id = "map"
+            st.ns = 'as_namespace'
+            st.id = count
+            st.header.stamp = rospy.Time(0)
+            st.type = 2 # sphere
+            st.action = 0 # add
+            st.pose.position.x = s[0] * self.robot_perception.resolution + \
+                    self.robot_perception.origin['x']
+            st.pose.position.y = s[1] * self.robot_perception.resolution + \
+                    self.robot_perception.origin['y']
+
+            st.color.r = 0
+            st.color.g = 0.8
+            st.color.b = 0
+            st.color.a = 0.8
+            st.scale.x = 0.2
+            st.scale.y = 0.2
+            st.scale.z = 0.2
+            ros_subgoals.markers.append(st)
+            count += 1
+
+        self.subtargets_publisher.publish(ros_subgoals)
 
         self.inner_target_exists = True
 

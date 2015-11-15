@@ -10,6 +10,7 @@ print_velocities: False
 calculate_target: True
 
 # Topics to read and post data
+# Subscribers
 laser_topic: '/robot0/laser_0'
 sonar_front_topic: '/robot0/sonar_0'
 sonar_left_topic: '/robot0/sonar_1'
@@ -17,8 +18,13 @@ sonar_right_topic: '/robot0/sonar_2'
 sonar_rear_left_topic: '/robot0/sonar_3'
 sonar_rear_right_topic: '/robot0/sonar_4'
 ogm_topic: '/slam/occupancyGridMap'
-coverage_pub_topic: '/robot/coverage'
+# Publishers
+coverage_pub_topic: '/as/robot/coverage'
 speeds_pub_topic: '/robot0/cmd_vel'
+robot_trajectory_topic: '/as/robot/trajectory'
+path_pub_topic: '/as/path'
+subgoals_pub_topic: '/as/subgoals'
+curr_target_pub_topic: '/as/current_target'
 
 # Frames
 map_frame: '/map'
