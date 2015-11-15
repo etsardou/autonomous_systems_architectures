@@ -17,11 +17,16 @@ class SonarDataAggregator:
         self.sonar_rear_right_range = 0
 
         # ROS Subscribers to the robot's sonars
-        rospy.Subscriber("/robot0/sonar_0", Range, self.getDataSonarFront) 
-        rospy.Subscriber("/robot0/sonar_1", Range, self.getDataSonarLeft) 
-        rospy.Subscriber("/robot0/sonar_2", Range, self.getDataSonarRight) 
-        rospy.Subscriber("/robot0/sonar_3", Range, self.getDataSonarRearLeft) 
-        rospy.Subscriber("/robot0/sonar_4", Range, self.getDataSonarRearRight) 
+        rospy.Subscriber(rospy.get_param('sonar_front_topic'), Range, \
+                self.getDataSonarFront) 
+        rospy.Subscriber(rospy.get_param('sonar_left_topic'), Range, \
+                self.getDataSonarLeft) 
+        rospy.Subscriber(rospy.get_param('sonar_right_topic'), Range, \
+                self.getDataSonarRight) 
+        rospy.Subscriber(rospy.get_param('sonar_rear_left_topic'), Range, \
+                self.getDataSonarRearLeft) 
+        rospy.Subscriber(rospy.get_param('sonar_rear_right_topic'), Range, \
+                self.getDataSonarRearRight) 
 
     # Getting data from the front sonar
     def getDataSonarFront(self, data):

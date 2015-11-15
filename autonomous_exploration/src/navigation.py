@@ -9,7 +9,7 @@ from path_planning import PathPlanning
 from nav_msgs.msg import Path
 from geometry_msgs.msg import PoseStamped
 
-# Class for reading the data from sensors
+# Class for implementing the navigation module of the robot
 class Navigation:
 
     # Constructor
@@ -35,7 +35,7 @@ class Navigation:
         # Container for the next subtarget. Holds the index of the next subtarget
         self.next_subtarget = 0
 
-        # Check if subgoal is reached 
+        # Check if subgoal is reached via a timer callback
         rospy.Timer(rospy.Duration(0.10), self.checkTarget)
 
         # ROS Publisher for the path
@@ -58,12 +58,17 @@ class Navigation:
 
         # Check if distance is less than 10 px (20 cm)
         if dist < 10:
+          print "Sub target reached!"
           self.next_subtarget += 1
 
           # Check if the final subtarget has been approached
           if self.next_subtarget == len(self.subtargets):
+            print "Final goal reached!"
             self.target_exists = False
 
+    # Function that seelects the next target, produces the path and updates
+    # the coverage field. This is called from the speeds assignment code, since
+    # it contains timer callbacks
     def selectTarget(self):
         # IMPORTANT: The robot must be stopped if you call this function until
         # it is over
@@ -80,11 +85,12 @@ class Navigation:
         self.robot_perception.updateCoverage()
         print "Navigation: Coverage updated"
       
+        # Gets copies of the map and coverage
         local_ogm = self.robot_perception.getMap()
         local_coverage = self.robot_perception.getCoverage()
         print "Got the map and Coverage"
   
-        # Call the target selection function to do this
+        # Call the target selection function to select the next best goal
         target = self.target_selection.selectTarget(\
             local_ogm,\
             local_coverage,\
@@ -97,13 +103,15 @@ class Navigation:
             [self.robot_perception.robot_pose['x_px'],\
             self.robot_perception.robot_pose['y_px']])
 
-        #target = [242,250]
+        # Need to reverse the path??
         self.path = self.path_planning.createPath(\
             local_ogm,\
             g_robot_pose,\
             target)
         print "Navigation: Path for target found with " + str(len(self.path)) +\
             " points"
+        # Reverse the path to start from the robot
+        self.path = self.path[::-1]
 
         # Break the path to subgoals every 25 pixels (0.5m)
         n_subgoals = (int) (len(self.path)/25)
@@ -112,15 +120,18 @@ class Navigation:
           self.subtargets.append(self.path[i * 25])
         self.subtargets.append(self.path[-1])
         self.next_subtarget = 0
+        print "The path produced " + str(len(self.subtargets)) + " subgoals"
 
-        # Publish the target and the path for visualization purposes
+        # Publish the target, the subtargets and the path for visualization purposes
         ros_path = Path()
         ros_path.header.frame_id = "map"
         for p in self.path:
           ps = PoseStamped()
           ps.header.frame_id = "map"
-          ps.pose.position.x = p[0] * self.robot_perception.resolution + self.robot_perception.origin['x']
-          ps.pose.position.y = p[1] * self.robot_perception.resolution + self.robot_perception.origin['y']
+          ps.pose.position.x = p[0] * self.robot_perception.resolution + \
+                  self.robot_perception.origin['x']
+          ps.pose.position.y = p[1] * self.robot_perception.resolution + \
+                  self.robot_perception.origin['y']
           ros_path.poses.append(ps)
 
         self.path_publisher.publish(ros_path)

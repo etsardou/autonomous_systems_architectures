@@ -1,3 +1,25 @@
-velocities_architecture: motor_schema
+# Select the velocities assignment architecture
+# Possible values: 'motor_schema' or 'subsumption'
+velocities_architecture: 'motor_schema'
 
+# Debugging purposes
+print_velocities: False
+
+# True for calculating targets
+# False for just wandering
 calculate_target: True
+
+# Topics to read and post data
+laser_topic: '/robot0/laser_0'
+sonar_front_topic: '/robot0/sonar_0'
+sonar_left_topic: '/robot0/sonar_1'
+sonar_right_topic: '/robot0/sonar_2'
+sonar_rear_left_topic: '/robot0/sonar_3'
+sonar_rear_right_topic: '/robot0/sonar_4'
+ogm_topic: '/slam/occupancyGridMap'
+coverage_pub_topic: '/robot/coverage'
+speeds_pub_topic: '/robot0/cmd_vel'
+
+# Frames
+map_frame: '/map'
+base_footprint_frame: '/base_footprint'

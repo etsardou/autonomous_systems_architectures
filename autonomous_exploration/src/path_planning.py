@@ -3,19 +3,22 @@
 import rospy
 import math
 
-# Class for reading the data from sensors
+# Class that implements path planning via A*
 class PathPlanning:
 
     # Constructor
     def __init__(self):
         pass
 
+    # Function to be called from navigation
     def createPath(self, ogm, robot_pose, target_pose):
+        # Debugging purposes print
         print "PathPlanning: RobotPose=" + str(robot_pose) + " Target=" + \
                 str(target_pose)
+        # Call of the internal A* function
         return self.aStar(ogm, robot_pose, target_pose)
 
-    # The heuristic function for A*
+    # The heuristic function for A* - simply the Eucledian distance
     def aStarHeuristic(self, p, q):
         return math.hypot(p[0] - q[0], p[1] - q[1])
 
@@ -23,6 +26,7 @@ class PathPlanning:
     def aStarReconstructPath(self, came_from, current):
         total_path = [current]
         local_curr = list(current)
+        # Following the path backwards
         while True:
             temp = came_from[tuple(local_curr)]
             if temp == None:
@@ -31,6 +35,7 @@ class PathPlanning:
             total_path.append(local_curr)
         return total_path
 
+    # The A* implementation
     def aStar(self, ogm, start, goal):
         
         # The set of evaluated nodes
@@ -48,10 +53,10 @@ class PathPlanning:
         # Estimated total cost from start to goal via y
         f_score = {}
         f_score[tuple(start)] = g_score[tuple(start)] + \
-                self.aStarHeuristic(tuple(start), tuple(goal)) #??
+                self.aStarHeuristic(tuple(start), tuple(goal))
 
+        # Try while there are elements to check
         while len(open_set) != 0:
-            #print "Open set: " + str(open_set)
             # Find element in open set with minimum f_score
             min_key = -1
             min_val = float('inf')
@@ -61,41 +66,32 @@ class PathPlanning:
                     min_val = f_score[tuple(key)]
 
             current = min_key
-            #print "Current: " + str(current) + " with cost " + str(min_val)
             # Check if the goal was reached
             if tuple(current) == tuple(goal):
                 return self.aStarReconstructPath(came_from, goal)
 
             open_set.remove(tuple(current))
             closed_set.append(tuple(current))
-            #print "open set now: " + str(open_set)
-            #print "closed set now: " + str(closed_set)
 
             # Go through the current's neighbors
             for i in range(-1, 2):
                 for j in range(-1, 2):
                     neighbor = [current[0] + i, current[1] + j]
-                    #print "Checking neighbor " + str(neighbor)
                     # Check if the neighbor is unoccupied
                     if ogm[neighbor[0]][neighbor[1]] > 49:
-                        #print "neigh is occupied: " + str(ogm[neighbor[0]][neighbor[1]])
                         continue
-                    #print "neigh is unoccupied"
+                    
                     # The neighbor is already evaluated
                     if tuple(neighbor) in closed_set:
                         continue
-                    #print "neigh is not in closed set"
                     # Length of this path
                     tentative_g_score = g_score[tuple(current)] + \
                             self.aStarHeuristic(tuple(current), tuple(neighbor))
-                    #print "tentative score : " + str(tentative_g_score)
+                    
                     # Check if we have a new node
                     if tuple(neighbor) not in open_set:
-                        #print "Added neighbor in open set"
                         open_set.append(tuple(neighbor))
                     elif tentative_g_score >= g_score[tuple(neighbor)]:
-                        #print "Tentative is larger than neighbor score: " + \
-                                #str(tentative_g_score) + " " + str(g_score[tuple(neighbor)])
                         continue    # This is not a better path
 
                     #print "Update values"
