@@ -6,6 +6,7 @@ The perfect score is 100 points, but if you do your best you can reach 150!
 
 - [Installation / setup](https://github.com/etsardou/autonomous_systems_architectures/wiki/Installation-&--setup)
 - [Modules description](https://github.com/etsardou/autonomous_systems_architectures/wiki/Modules-description)
+- [How to execute the code](https://github.com/etsardou/autonomous_systems_architectures/wiki/How-to-execute-the-code)
 - **Part 1 - Obstacle avoidance / random wandering** (*50 pts*)
 	- Challenge 1 [*15 pts*]: [Obstacle avoidance using the sonars sensors](https://github.com/etsardou/autonomous_systems_architectures/wiki/Challenge-1:-Obstacle-avoidance-using-the-sonars-sensors)
 	- Challenge 2 [*15 pts*]: [Obstacle avoidance using the laser sensor](https://github.com/etsardou/autonomous_systems_architectures/wiki/Challenge-2:-Obstacle-avoidance-using-the-laser-sensor)
