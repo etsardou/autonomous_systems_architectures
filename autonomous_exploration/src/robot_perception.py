@@ -5,6 +5,8 @@ import tf
 import numpy
 
 from nav_msgs.msg import OccupancyGrid
+from nav_msgs.msg import Path
+from geometry_msgs.msg import PoseStamped
 
 # Class implementing the robot perception: Reading the map, the coverage map
 # and the robot pose
@@ -27,7 +29,7 @@ class RobotPerception:
         self.ogm_info = 0
 
         # Holds the robot's total path
-        self.robot_path = []
+        self.robot_trajectory = []
 
         # Holds the coverage information. This has the same size as the ogm
         # If a cell has the value of 0 it is uncovered
@@ -62,6 +64,11 @@ class RobotPerception:
         # ROS Subscriber to the occupancy grid map
         ogm_topic = rospy.get_param('ogm_topic')
         rospy.Subscriber(ogm_topic, OccupancyGrid, self.readMap) 
+
+        # Publisher of the robot trajectory
+        robot_trajectory_topic = rospy.get_param('robot_trajectory_topic')
+        self.robot_trajectory_publisher = rospy.Publisher(robot_trajectory_topic,\
+                Path, queue_size = 10)
 
         # Publisher of the coverage field
         coverage_pub_topic = rospy.get_param('coverage_pub_topic')
@@ -123,8 +130,19 @@ class RobotPerception:
         # YOUR CODE HERE ------------------------------------------------------
         # Update the robot path. This is a python list. Since we use the path
         # only for updating the coverage, try not to add duplicates
+        # Each point should be in the form of [x,y]
 
         # ---------------------------------------------------------------------
+
+        t_path = Path()
+        t_path.header.frame_id = "map"
+        for p in self.robot_trajectory:
+            ps = PoseStamped()
+            ps.header.frame_id = "map"
+            ps.pose.position.x = p[0]
+            ps.pose.position.y = p[1]
+            t_path.poses.append(ps)
+        self.robot_trajectory_publisher.publish(t_path)
 
     # Getting the occupancy grid map
     def readMap(self, data):

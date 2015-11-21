@@ -3,7 +3,8 @@ Panels:
     Help Height: 78
     Name: Displays
     Property Tree Widget:
-      Expanded: ~
+      Expanded:
+        - /Total Path1
       Splitter Ratio: 0.647651
     Tree Height: 697
   - Class: rviz/Selection
@@ -88,14 +89,14 @@ Visualization Manager:
         X: 0
         Y: 0
         Z: 0
-      Topic: /robot_trajectory
+      Topic: /as/robot/trajectory
       Value: true
     - Class: rviz/MarkerArray
       Enabled: true
       Marker Topic: /as/subgoals
       Name: Current subgoals
       Namespaces:
-        {}
+        as_namespace: true
       Queue Size: 100
       Value: true
     - Class: rviz/Axes
@@ -110,7 +111,7 @@ Visualization Manager:
       Marker Topic: /as/current_target
       Name: Current subgoal
       Namespaces:
-        {}
+        as_curr_namespace: true
       Queue Size: 100
       Value: true
   Enabled: true
@@ -137,7 +138,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/XYOrbit
-      Distance: 12.8492
+      Distance: 14.9537
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.06
         Stereo Focal Distance: 1
@@ -170,5 +171,5 @@ Window Geometry:
   Views:
     collapsed: true
   Width: 946
-  X: 958
+  X: 951
   Y: 17
