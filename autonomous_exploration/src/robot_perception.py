@@ -130,8 +130,8 @@ class RobotPerception:
         # YOUR CODE HERE ------------------------------------------------------
         # Update the robot path. This is a python list. Since we use the path
         # only for updating the coverage, try not to add duplicates
-        # Each point should be in the form of [x,y]
-
+        # Each point should be in the form of [x,y] (theta does not concern us)
+        
         # ---------------------------------------------------------------------
 
         t_path = Path()
@@ -196,13 +196,20 @@ class RobotPerception:
         # We suppose that in every pose the robot covers an area of 2m x 2m
         # around it
         # 0 is for the uncovered, 100 is for the covered
+        # PS. Try to make it fast :)
+        # PS2. Do not have coverage values on obstacles or unknown space!
+        # If done correctly, the coverage will appear purple in rviz
 
         # ---------------------------------------------------------------------
-
         # Publishing coverage ogm to see it in rviz
         coverage_ogm = OccupancyGrid()
         coverage_ogm.header.frame_id = "map"
         coverage_ogm.info = self.ogm_info
+        coverage_ogm.data = numpy.zeros(self.ogm_info.width * self.ogm_info.height)
+        for i in range(0, self.ogm_info.width):
+            for j in range(0, self.ogm_info.height):
+                coverage_ogm.data[i + self.ogm_info.width * j] = self.coverage[i][j]
+
         self.coverage_publisher.publish(coverage_ogm)
     
     # Transforms relative coordinates to global

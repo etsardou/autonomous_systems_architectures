@@ -3,8 +3,7 @@ Panels:
     Help Height: 78
     Name: Displays
     Property Tree Widget:
-      Expanded:
-        - /Total Path1
+      Expanded: ~
       Splitter Ratio: 0.647651
     Tree Height: 697
   - Class: rviz/Selection
@@ -71,12 +70,12 @@ Visualization Manager:
       Value: true
     - Alpha: 0.7
       Class: rviz/Map
-      Color Scheme: map
-      Draw Behind: false
-      Enabled: false
+      Color Scheme: costmap
+      Draw Behind: true
+      Enabled: true
       Name: Coverage Map
       Topic: /as/robot/coverage
-      Value: false
+      Value: true
     - Alpha: 1
       Buffer Length: 1
       Class: rviz/Path
@@ -138,22 +137,22 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/XYOrbit
-      Distance: 14.9537
+      Distance: 15.1868
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.06
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0.473968
-        Y: -0.558018
+        X: 0.858546
+        Y: 0.0329632
         Z: 8.81118e-06
       Name: Current View
       Near Clip Distance: 0.01
-      Pitch: 0.900204
+      Pitch: 0.774797
       Target Frame: <Fixed Frame>
       Value: XYOrbit (rviz)
-      Yaw: 3.80816
+      Yaw: 3.64316
     Saved: ~
 Window Geometry:
   Displays:
@@ -171,5 +170,5 @@ Window Geometry:
   Views:
     collapsed: true
   Width: 946
-  X: 951
+  X: 944
   Y: 17
