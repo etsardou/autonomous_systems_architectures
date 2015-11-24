@@ -1,5 +1,7 @@
 ##Autonomous systems course
 
+[![Join the chat at https://gitter.im/etsardou/autonomous_systems_architectures](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/etsardou/autonomous_systems_architectures?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 This code was created in order to allow for experimentation, towards developing specific modules of an autonomous simulated vehicle that performs full exploration and coverage of an unknown a priori environment. Next, you can find instructions on how to setup the code in your PC / laptop, the description of the code, as well as the challenges.
 
 The perfect score is 100 points, but if you do your best you can reach 150!
