@@ -25,3 +25,5 @@ The perfect score is 100 points, but if you do your best you can reach 150!
 	- Challenge 11 [*10 pts*]: [Create a smart target selection technique](https://github.com/etsardou/autonomous_systems_architectures/wiki/Challenge-11:-Create-a-smart-target-selection-technique)
 	- Challenge 12 [*10 pts*]: [Improve the A* algorithm's efficiency](https://github.com/etsardou/autonomous_systems_architectures/wiki/Challenge-12:-Improve-the-A*-algorithm's-efficiency)
 	- Challenge 13 [*up to 25 pts*]: [Surprise us!](https://github.com/etsardou/autonomous_systems_architectures/wiki/Challenge-13:-Surprise-us!)
+
+PS: You can also contribute by providing more tasks (and the code needed to deploy them)
